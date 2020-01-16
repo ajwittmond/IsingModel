@@ -52,7 +52,7 @@ bool IsingWindow::step() {
     }
     prev_time = curr_time;
   }
-
+  isingArea->signal_draw().conne
   //TODO: Update logic
   return true;
 }

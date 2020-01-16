@@ -1,8 +1,9 @@
 #include <vector>
-
+#include "drawable.h"
 
 
 struct Node{
+
   bool spin;
 };
 
