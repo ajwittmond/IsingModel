@@ -1,5 +1,7 @@
 #include <gtkmm.h>
 #include <sigc++/sigc++.h>
+#include "model.h"
+#include "ticker.h"
 
 //This is the top level class for the view
 class IsingWindow : public sigc::trackable{
@@ -12,11 +14,12 @@ class IsingWindow : public sigc::trackable{
   Gtk::Window& getWindow();
 
  protected:
-  Gtk::DrawingArea *isingArea;
-  Gtk::DrawingArea* magnetismTicker;
-  Gtk::DrawingArea* varianceTicker;
+  std::unique_ptr<IsingModel> model;
+  std::unique_ptr<Ticker> magnetismTicker;
+  std::unique_ptr<Ticker> varianceTicker;
   Gtk::Window* window;
   sigc::connection timout;
+  double step_frequency = 1/10;
 
   bool step();
 

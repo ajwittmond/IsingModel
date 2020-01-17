@@ -4,11 +4,11 @@
 
 class Drawable : public sigc::trackable{
 protected:
-  std::vector<Drawable*> children;
+  std::vector<std::unique_ptr<Drawable>> children;
 
   bool drawChildren(const Cairo::RefPtr<Cairo::Context>& cr) {
     bool out = false;
-    for(Drawable* d: children){
+    for(auto& d: children){
       out = out || d->draw(cr);
     }
     return out;
@@ -24,10 +24,16 @@ public:
   }
 
   // references can't be null
-  void addChild(Drawable &d) { children.push_back(&d); }
+  void addChild(std::unique_ptr<Drawable>&& d) {
+    children.push_back(d);
+  }
 
-  void removeChild(Drawable &d) {
-    children.erase(std::find(children.begin(), children.end(), &d));
+  void removeChild(int i) {
+    children.erase(children.begin() + i);
+  }
+
+  const std::vector<std::unique_ptr<Drawable>>& getChildren(){
+    return children;
   }
 };
 
@@ -41,6 +47,11 @@ public:
 
 
 class Shape : public Drawable{
+private:
+  bool between(double x,double min, double max){
+    return x<min && x>max;
+  }
+
 public:
   double x=0,y=0; // coordinates of center
   double angle=0;
@@ -48,6 +59,8 @@ public:
   double sx=1,sy=1; //size of bounding box
 
   Shape() = default;
+
+  Shape(double x, double y, double sx, double sy): x(x), y(y), sx(sx), sy(sy){}
 
   void set_position(double x, double y){
     this->x = x;
@@ -77,11 +90,20 @@ public:
     cr->restore();
     return out;
   }
+
+
+  //by default tests the unoriented bounding box
+  virtual bool point_inside(double x, double y){
+    return between(x,this->x -sx, this->y + sx) &&
+      between(y,this->y - sy, this->y + sy);
+  }
 };
 
 class Square : public Shape{
 public:
   Square() = default;
+
+  Square(double x, double y, double sx, double sy) : Shape(x, y, sx, sy) {  }
 
   virtual bool draw_shape(const Cairo::RefPtr<Cairo::Context> &cr) override{
     cr->move_to(0, -0.5);
@@ -98,6 +120,8 @@ public:
 class Triangle : public Shape {
 public:
   Triangle() = default;
+
+  Triangle(double x, double y, double sx, double sy) : Shape(x, y, sx, sy) {}
 
   virtual bool draw_shape(const Cairo::RefPtr<Cairo::Context> &cr) override {
     cr->move_to(0, -0.5);

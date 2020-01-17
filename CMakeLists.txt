@@ -18,7 +18,7 @@ LINK_DIRECTORIES(${GTK3_LIBRARY_DIRS} ${PROJECT_SOURCE_DIR})
 ADD_DEFINITIONS(${GTK3_CFLAGS_OTHER})
 
 # add the executable
-add_executable(Ising main.cpp isingWindow.cpp isingWindow.h)
+add_executable(Ising main.cpp isingWindow.cpp ticker.cpp model.cpp)
 
 
 # Link the target to the GTK+ libraries
