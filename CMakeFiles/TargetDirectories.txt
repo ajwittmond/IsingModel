@@ -1,3 +1,0 @@
-/home/alexanderwittmond/code/c++/IsingModel/CMakeFiles/rebuild_cache.dir
-/home/alexanderwittmond/code/c++/IsingModel/CMakeFiles/Ising.dir
-/home/alexanderwittmond/code/c++/IsingModel/CMakeFiles/edit_cache.dir
