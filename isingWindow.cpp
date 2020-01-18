@@ -5,22 +5,20 @@
 #include <iostream>
 #include <vector>
 
-void IsingWindow::from_file() throw(Glib::Exception){
+void IsingWindow::from_file() throw(){
   builder = Gtk::Builder::create();
   builder->add_from_file("Ising.glade");
   Gtk::DrawingArea *area;
   builder->get_widget("isingArea",area);
   model =
-    std::make_unique<IsingModel>(
-                                 new IsingModel(area,
-                                                rectangular_grid(100,100,10,2),
-                                                1,1,1
-                                                )
+    std::make_unique<IsingModel>(area,
+                                 rectangular_grid(10,10,10,2),
+                                 1,1,1
                                  );
   builder->get_widget("magnetismArea", area);
-  magnetismTicker = std::make_unique<Ticker>(new Ticker(area));
+  magnetismTicker = std::make_unique<Ticker>(area);
   builder->get_widget("varianceArea",area);
-  varianceTicker = std::make_unique<Ticker>(new Ticker(area));
+  varianceTicker = std::make_unique<Ticker>(area);
   builder->get_widget("window", this->window);
   timout = Glib::signal_timeout().connect(sigc::mem_fun(*this,&IsingWindow::step), 16);
 }
@@ -38,11 +36,13 @@ bool IsingWindow::step() {
   static double timer  = 0;
   const int INTERVAL = 1;
   double dt = 0;
+
+  //time keeping and reporting
   if (first){
     first = false;
   }else{
     curr_time = std::chrono::system_clock::now();
-    double dt = std::chrono::duration<double>(curr_time - prev_time).count();
+    dt = std::chrono::duration<double>(curr_time - prev_time).count();
     samples.push_back(dt);
     timer += dt;
     //print estimates of the mean and standard deviations of the samples
@@ -65,10 +65,12 @@ bool IsingWindow::step() {
     }
     prev_time = curr_time;
   }
-  //TODO: Update logic
 
+
+  //update logic
   static double step_timer = 0;
   step_timer+=dt;
+
   if(step_timer> step_frequency){
     step_timer-= step_frequency;
     model->step();

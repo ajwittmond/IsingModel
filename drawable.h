@@ -1,10 +1,12 @@
+#pragma once
+
 #include <gtkmm/drawingarea.h>
 #include <sigc++/sigc++.h>
 #include <vector>
 
 class Drawable : public sigc::trackable{
 protected:
-  std::vector<std::unique_ptr<Drawable>> children;
+  std::vector<std::shared_ptr<Drawable>> children;
 
   bool drawChildren(const Cairo::RefPtr<Cairo::Context>& cr) {
     bool out = false;
@@ -15,7 +17,7 @@ protected:
   }
 
 public:
-  Drawable();
+  Drawable() = default;
 
   virtual bool draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
 
@@ -24,7 +26,7 @@ public:
   }
 
   // references can't be null
-  void addChild(std::unique_ptr<Drawable>&& d) {
+  void addChild(std::shared_ptr<Drawable>&& d) {
     children.push_back(d);
   }
 
@@ -32,7 +34,7 @@ public:
     children.erase(children.begin() + i);
   }
 
-  const std::vector<std::unique_ptr<Drawable>>& getChildren(){
+  const std::vector<std::shared_ptr<Drawable>>& getChildren(){
     return children;
   }
 };
@@ -55,7 +57,8 @@ private:
 public:
   double x=0,y=0; // coordinates of center
   double angle=0;
-  double r=0,g=0,b=0,a=1;
+  double fr = 0, fg = 0, fb = 0, fa = 1;
+  double sr = 0, sg = 0, sb = 0, sa = 1;
   double sx=1,sy=1; //size of bounding box
 
   Shape() = default;
@@ -67,11 +70,18 @@ public:
     this->y = y;
   }
 
-  void set_color(double r,double g, double b, double a){
-    this->r = r;
-    this->g = g;
-    this->b = b;
-    this->a = a;
+  void set_fill_color(double r,double g, double b, double a){
+    this->fr = r;
+    this->fg = g;
+    this->fb = b;
+    this->fa = a;
+  }
+
+  void set_stroke_color(double r, double g, double b, double a) {
+    this->sr = r;
+    this->sg = g;
+    this->sb = b;
+    this->sa = a;
   }
 
   void set_dimensions(double sx, double sy){
@@ -85,7 +95,7 @@ public:
     cr->translate(x, y);
     cr->scale(sx, sy);
     cr->rotate(angle);
-    cr->set_source_rgba(r, g, b, a);
+    cr->set_source_rgb(fr, fg, fb);
     bool out = draw_shape(cr);
     cr->restore();
     return out;
@@ -106,13 +116,12 @@ public:
   Square(double x, double y, double sx, double sy) : Shape(x, y, sx, sy) {  }
 
   virtual bool draw_shape(const Cairo::RefPtr<Cairo::Context> &cr) override{
-    cr->move_to(0, -0.5);
-    cr->move_to(-0.5, 0);
-    cr->move_to(0, 1);
-    cr->move_to(1, 0);
-    cr->move_to(0, 1);
+
+    cr->rectangle(-0.5, -0.5, 1, 1);
     cr->close_path();
     cr->fill();
+    cr->set_source_rgb(sr, sg, sb);
+    cr->stroke();
     return false;
   }
 };
@@ -131,6 +140,22 @@ public:
     cr->move_to(0, 1);
     cr->close_path();
     cr->fill();
+    cr->set_source_rgb(sr, sg, sb);
+    cr->stroke();
     return false;
+  }
+};
+
+
+class AreaController{
+private:
+  Gtk::DrawingArea* area;
+public:
+  AreaController(Gtk::DrawingArea *area): area{area} {}
+
+  void invalidate_rect() {
+    auto win = area->get_window();
+    if(win)
+      win->invalidate_rect(area->get_allocation(), true);
   }
 };

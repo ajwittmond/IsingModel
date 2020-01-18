@@ -1,3 +1,5 @@
+#pragma once
+
 #include <drawable.h>
 #include <vector>
 
@@ -6,21 +8,13 @@ struct Sample{
   double value;
 };
 
-class Ticker : public Drawable {
+class Ticker : public Drawable , public AreaController{
 private:
-  Gtk::DrawingArea *area;
   std::vector<Sample> samples;
 
 public:
-  Ticker(Gtk::DrawingArea *area) : area{area} {
+  Ticker(Gtk::DrawingArea *area) : AreaController(area) {
     this->connect(*area);
-    auto win = area->get_window();
-    win->invalidate_rect(area->get_allocation(), true );
-  }
-
-  void invalidate_rect() {
-    auto win = area->get_window();
-    win->invalidate_rect(area->get_allocation(), true);
   }
 
   virtual bool draw(const Cairo::RefPtr<Cairo::Context> &cr) override; 

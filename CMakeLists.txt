@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
+
+
 # set the project name
 project(Ising)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Use the package PkgConfig to detect GTK+ headers/library files
 FIND_PACKAGE(PkgConfig REQUIRED)

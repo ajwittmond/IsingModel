@@ -1,18 +1,28 @@
+#pragma once
+
 #include <vector>
 #include "drawable.h"
+#include <iostream>
 
 
 class Node : public ChildDrawer{
+private:
+  int index;
 public:
-  const int index;
+  
   int spin = 1;
   bool fixed = false;
   bool on_boundary=false;
+  std::shared_ptr<Shape> shape;
 
-  Node(std::unique_ptr<Shape>&& shape,int index)
-    :index(index){
-    Shape* s = shape.release();
-    addChild(std::make_unique<Drawable>(s));
+  Node(std::shared_ptr<Shape> &&shape, int index)
+    : index(index),shape(shape) {
+    std::shared_ptr<Drawable> d = shape;
+    addChild(shape);
+  }
+
+  int get_index(){
+    return index;
   }
 
   ~Node() = default;
@@ -99,26 +109,23 @@ public:
 };
 
 
-class IsingModel : public Drawable{
+class IsingModel : public Drawable, public AreaController{
  public:
   Graph graph;
   double h;
   double j;
   double t;
 
-  Gtk::DrawingArea *area;
 
   IsingModel(Gtk::DrawingArea *area, Graph graph, double h, double j, double t)
-    : graph(graph), h(h), j(j), t(t), area(area) {}
+    : graph(graph), h(h), j(j), t(t),  AreaController(area) {
+    connect(*area);
+  }
 
   void step();
 
-  void invalidate_rect() {
-    auto win = area->get_window();
-    win->invalidate_rect(area->get_allocation(), true);
-  }
-
   bool draw(const Cairo::RefPtr<Cairo::Context> &cr) override{
+    static int x = 0;
     return graph.draw(cr);
   }
 };

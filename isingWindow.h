@@ -1,3 +1,5 @@
+#pragma once
+
 #include <gtkmm.h>
 #include <sigc++/sigc++.h>
 #include "model.h"
@@ -9,7 +11,7 @@ class IsingWindow : public sigc::trackable{
   IsingWindow() = default;
   virtual ~IsingWindow() = default;
 
-  void from_file() throw(Glib::Exception);
+  void from_file() throw();
 
   Gtk::Window& getWindow();
 
@@ -19,7 +21,7 @@ class IsingWindow : public sigc::trackable{
   std::unique_ptr<Ticker> varianceTicker;
   Gtk::Window* window;
   sigc::connection timout;
-  double step_frequency = 1/10;
+  double step_frequency = 1.0/10.0;
 
   bool step();
 

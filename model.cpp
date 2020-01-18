@@ -6,17 +6,24 @@ double sigmoid(double x){
 }
 
 void IsingModel::step(){
-  for(Node& node : graph.nodes){
+  std::vector<Node> nodes = graph.nodes;
+  std::random_shuffle(nodes.begin(), nodes.end()); // reduces bias visible in animation
+  for(Node& node : nodes){
     double beta = 1/t;
     double local_field = h;
-    for(int i: graph.edges[node.index]){
-      local_field = j*graph.nodes[i].spin;
+    for(int i: graph.edges[node.get_index()]){
+      local_field = j*graph.nodes[i].spin*node.spin;
     }
     double p = sigmoid(-2*beta*local_field);
-    if((double)rand()/(double) RAND_MAX < p ){
+    if ((!node.on_boundary) && (double)rand() / (double)RAND_MAX < p) {
       node.spin = 1;
-    }else{
+    } else {
       node.spin = -1;
+    }
+    if(node.spin == 1){
+      node.shape->set_fill_color(1, 1, 1, 1);
+    }else{
+      node.shape->set_fill_color(0, 0, 0, 1);
     }
   }
 }
@@ -47,16 +54,16 @@ Boundary Graph::get_boundary(){
 
 Graph rectangular_grid(int w, int h, double size, double gap) {
   Graph out;
-  out.nodes = std::vector<Node>(w*h);
+  out.nodes = std::vector<Node>();
   out.edges = std::vector<std::vector<int>>(w*h);
   for(int i = 0; i<w*h ; i++)
     out.edges.push_back(std::vector<int>(3));
   for(int x = 0 ; x< w; x++){
     for(int y = 0; y<h; y++){
-      Node n(std::make_unique<Shape>(new Square(x * (size + gap) + size / 2,
-                                                y * (size + gap) + size / 2,
-                                                size,
-                                                size)),
+      Node n(std::make_shared<Square>(x * (size + gap) + size / 2,
+                                     y * (size + gap) + size / 2,
+                                     size,
+                                     size),
              x * w + y);
       n.on_boundary = x==0 || y==0 || x==w-1 || y==h-1 ;
       out.add_node(n);
