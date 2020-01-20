@@ -1,6 +1,9 @@
 #include "model.h"
 #include <cstdlib>
 
+
+
+
 double sigmoid(double x){
   return 1/(1 + exp(x));
 }
@@ -9,23 +12,46 @@ void IsingModel::step(){
   std::vector<Node> nodes = graph.nodes;
   std::random_shuffle(nodes.begin(), nodes.end()); // reduces bias visible in animation
   for(Node& node : nodes){
-    double beta = 1/t;
-    double local_field = h;
+    double beta = 1/(*t);
+    double local_field = *h;
     for(int i: graph.edges[node.get_index()]){
-      local_field = j*graph.nodes[i].spin*node.spin;
+      local_field += *j*graph.nodes[i].spin ;
     }
     double p = sigmoid(-2*beta*local_field);
-    if ((!node.on_boundary) && (double)rand() / (double)RAND_MAX < p) {
-      node.spin = 1;
-    } else {
-      node.spin = -1;
+    if ((!node.on_boundary) || boundary_type == VARIABLE){
+      if (((double)rand() / (double)RAND_MAX) < p) {
+        graph.nodes[node.get_index()].spin = 1;
+      } else {
+        graph.nodes[node.get_index()].spin = -1;
+      }
     }
-    if(node.spin == 1){
-      node.shape->set_fill_color(1, 1, 1, 1);
-    }else{
-      node.shape->set_fill_color(0, 0, 0, 1);
+    if (graph.nodes[node.get_index()].spin == 1) {
+      graph.nodes[node.get_index()].shape->set_fill_color(1, 1, 1, 1);
+    } else {
+      graph.nodes[node.get_index()].shape->set_fill_color(0, 0, 0, 1);
     }
   }
+}
+
+void IsingModel::set_boundary(BoundaryType boundary){
+  bool even = true;
+  std::cout << boundary << std::endl;
+  for(Node& node : graph.get_boundary()){
+    even = !even;
+    switch(boundary){
+    case POSITIVE:
+      node.spin = 1;
+      break;
+    case NEGATIVE:
+      node.spin = -1;
+      break;
+    case PERIODIC:
+      node.spin = even ? 1 : -1 ;
+      break;
+    }
+  }
+  boundary_type = boundary;
+
 }
 
 BoundaryIterator& BoundaryIterator::operator++() {
@@ -75,3 +101,5 @@ Graph rectangular_grid(int w, int h, double size, double gap) {
   }
   return out;
 }
+
+

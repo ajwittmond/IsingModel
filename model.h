@@ -3,7 +3,7 @@
 #include <vector>
 #include "drawable.h"
 #include <iostream>
-
+#include "binding.h"
 
 class Node : public ChildDrawer{
 private:
@@ -85,13 +85,13 @@ public:
   BoundaryIterator &operator++();
 
   bool operator!=(const BoundaryIterator& it){
-    return !start && curr==first;
+    return !( !start && curr == first );
   }
 
   Node& operator*(){
     if(first==-1)
       find_first();
-    return graph.nodes[first];
+    return graph.nodes[curr];
   }
 
 };
@@ -108,26 +108,38 @@ public:
   BoundaryIterator end() { return BoundaryIterator(graph); }
 };
 
+enum BoundaryType{
+              POSITIVE=0,
+              NEGATIVE=1,
+              PERIODIC=2,
+              VARIABLE=3
+};
+
 
 class IsingModel : public Drawable, public AreaController{
  public:
   Graph graph;
-  double h;
-  double j;
-  double t;
+  std::shared_ptr<Binding<double>> h;
+  std::shared_ptr<Binding<double>> j;
+  std::shared_ptr<Binding<double>> t;
+  BoundaryType boundary_type = POSITIVE;
 
-
-  IsingModel(Gtk::DrawingArea *area, Graph graph, double h, double j, double t)
-    : graph(graph), h(h), j(j), t(t),  AreaController(area) {
+  IsingModel(Gtk::DrawingArea *area, Graph graph,
+             std::shared_ptr<Binding<double>> h,
+             std::shared_ptr<Binding<double>> j,
+             std::shared_ptr<Binding<double>> t)
+      : graph(graph), h(h), j(j), t(t), AreaController(area) {
     connect(*area);
   }
 
   void step();
 
-  bool draw(const Cairo::RefPtr<Cairo::Context> &cr) override{
+  bool draw(const Cairo::RefPtr<Cairo::Context> &cr) override {
     static int x = 0;
     return graph.draw(cr);
   }
+
+  void set_boundary(BoundaryType boundary);
 };
 
 //generates a rectangular grid of the the given width and height

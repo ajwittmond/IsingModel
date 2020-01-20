@@ -1,4 +1,4 @@
-#include "ticker.h";
+#include "ticker.h"
 
 
 bool Ticker::draw(const Cairo::RefPtr<Cairo::Context> &cr){
