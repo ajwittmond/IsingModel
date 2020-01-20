@@ -2,6 +2,11 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkListStore" id="liststore1"/>
   <object class="GtkListStore" id="liststore2"/>
   <object class="GtkListStore" id="liststore3"/>
@@ -149,6 +154,23 @@
               </packing>
             </child>
             <child>
+              <object class="GtkComboBoxText" id="boundaryBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="active">0</property>
+                <items>
+                  <item id="0" translatable="yes">Positive</item>
+                  <item id="1" translatable="yes">Negative</item>
+                  <item id="2" translatable="yes">Periodic</item>
+                  <item id="3" translatable="yes">Variable</item>
+                </items>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">3</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
@@ -225,6 +247,10 @@
                   <object class="GtkSpinButton" id="width">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="max_length">10000</property>
+                    <property name="width_chars">4</property>
+                    <property name="numeric">True</property>
+                    <property name="update_policy">if-valid</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -258,6 +284,8 @@
                   <object class="GtkSpinButton" id="height">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="max_length">10000</property>
+                    <property name="width_chars">4</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -269,29 +297,6 @@
               <packing>
                 <property name="left_attach">1</property>
                 <property name="top_attach">7</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkComboBoxText" id="boundaryBox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="active">0</property>
-                <property name="has_entry">True</property>
-                <items>
-                  <item id="0" translatable="yes">Patterned</item>
-                  <item id="1" translatable="yes">Positive</item>
-                  <item id="2" translatable="yes">Negative</item>
-                  <item id="3" translatable="yes">Variable</item>
-                </items>
-                <child internal-child="entry">
-                  <object class="GtkEntry">
-                    <property name="can_focus">False</property>
-                  </object>
-                </child>
-              </object>
-              <packing>
-                <property name="left_attach">1</property>
-                <property name="top_attach">3</property>
               </packing>
             </child>
             <child>

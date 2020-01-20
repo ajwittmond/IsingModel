@@ -2,9 +2,16 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkListStore" id="liststore1"/>
-  <object class="GtkListStore" id="liststore2"/>
-  <object class="GtkListStore" id="liststore3"/>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment2">
+    <property name="upper">100</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
   <object class="GtkWindow" id="window">
     <property name="name">window</property>
     <property name="can_focus">False</property>
@@ -242,6 +249,11 @@
                   <object class="GtkSpinButton" id="width">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="max_length">10000</property>
+                    <property name="width_chars">4</property>
+                    <property name="adjustment">adjustment2</property>
+                    <property name="numeric">True</property>
+                    <property name="update_policy">if-valid</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -275,6 +287,9 @@
                   <object class="GtkSpinButton" id="height">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="max_length">10000</property>
+                    <property name="width_chars">4</property>
+                    <property name="adjustment">adjustment1</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -303,4 +318,7 @@
       </object>
     </child>
   </object>
+  <object class="GtkListStore" id="liststore1"/>
+  <object class="GtkListStore" id="liststore2"/>
+  <object class="GtkListStore" id="liststore3"/>
 </interface>

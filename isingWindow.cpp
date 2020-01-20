@@ -11,7 +11,7 @@ sigc::slot<double,Glib::ustring> to = sigc::ptr_fun(t);
 sigc::slot<Glib::ustring,const double> from = sigc::ptr_fun(f);
 
 
-void setBoundary(Glib::PropertyProxy<int> row, IsingModel* model){
+void setBoundary(Glib::PropertyProxy<int> row, std::shared_ptr<IsingModel> model){
   model->set_boundary(static_cast<BoundaryType>((int)row));
 }
 
@@ -22,7 +22,22 @@ std::shared_ptr<Binding<double>> fromEntry(double start,Gtk::Entry * entry){
                                         from );
 }
 
-void IsingWindow::from_file() throw(){
+void reset(std::shared_ptr<IsingModel> model){
+  for(Node &node: model->graph.nodes){
+    node.spin = 1;
+  }
+}
+
+void changeGrid(std::shared_ptr<IsingModel> model,
+                Glib::PropertyProxy<double> w,
+                Glib::PropertyProxy<double> h){
+  model->graph = rectangular_grid(floor(w.get_value()),
+                                  floor(h.get_value()),
+                                  10,
+                                  2);
+}
+
+void IsingWindow::from_file() throw() {
   builder = Gtk::Builder::create();
   builder->add_from_file("Ising.glade");
   Gtk::DrawingArea *area;
@@ -35,16 +50,17 @@ void IsingWindow::from_file() throw(){
   builder->get_widget("jEntry", jEntry);
   builder->get_widget("tEntry", tEntry);
   builder->get_widget("fpsEntry", fpsEntry);
+  const int START_WIDTH=40, START_HEIGHT=40;
   model =
-      std::make_unique<IsingModel>(area, rectangular_grid(30, 30, 10, 2),
+      std::make_shared<IsingModel>(area, rectangular_grid(START_WIDTH, START_HEIGHT, 10, 2),
                                    fromEntry(1, hEntry),
                                    fromEntry(1, jEntry),
                                    fromEntry(1, tEntry)
                                    );
   builder->get_widget("magnetismArea", area);
-  magnetismTicker = std::make_unique<Ticker>(area);
+  magnetismTicker = std::make_shared<Ticker>(area);
   builder->get_widget("varianceArea",area);
-  varianceTicker = std::make_unique<Ticker>(area);
+  varianceTicker = std::make_shared<Ticker>(area);
   builder->get_widget("window", this->window);
   timout = Glib::signal_timeout().connect(sigc::mem_fun(*this,&IsingWindow::step), 16);
   this->step_frequency = fromEntry(10,fpsEntry);
@@ -52,13 +68,23 @@ void IsingWindow::from_file() throw(){
   Gtk::SpinButton * height;
   builder->get_widget("width", width);
   builder->get_widget("height", height);
+  width->set_value(START_WIDTH);
+  height->set_value(START_HEIGHT);
+  auto changGridF = sigc::bind(&changeGrid,
+                               model,
+                               width->property_value(),
+                               height->property_value());
+  width->signal_changed().connect(changGridF);
+  height->signal_changed().connect(changGridF);
   builder->get_widget("playButton", running);
   Gtk::ComboBoxText* boundary;
   builder->get_widget("boundaryBox", boundary);
   boundary->property_active().signal_changed().connect(sigc::bind(&setBoundary,
                                                                   boundary->property_active(),
-                                                                  &(*model)));
-
+                                                                  model));
+  Gtk::Button * button;
+  builder->get_widget("resetButton",button);
+  button->signal_clicked().connect(sigc::bind(&reset,model));
 }
 
 Gtk::Window& IsingWindow::getWindow(){

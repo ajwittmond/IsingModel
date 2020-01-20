@@ -14,21 +14,23 @@ void IsingModel::step(){
   for(Node& node : nodes){
     double beta = 1/(*t);
     double local_field = *h;
-    for(int i: graph.edges[node.get_index()]){
+    int index = node.get_index();
+    Node& orig = graph.nodes[index];
+    for(int i: graph.edges[index]){
       local_field += *j*graph.nodes[i].spin ;
     }
     double p = sigmoid(-2*beta*local_field);
     if ((!node.on_boundary) || boundary_type == VARIABLE){
       if (((double)rand() / (double)RAND_MAX) < p) {
-        graph.nodes[node.get_index()].spin = 1;
+        graph.nodes[index].spin = 1;
       } else {
-        graph.nodes[node.get_index()].spin = -1;
+        graph.nodes[index].spin = -1;
       }
     }
     if (graph.nodes[node.get_index()].spin == 1) {
-      graph.nodes[node.get_index()].shape->set_fill_color(1, 1, 1, 1);
+      orig.shape->set_fill_color(1, 1, 1, 1);
     } else {
-      graph.nodes[node.get_index()].shape->set_fill_color(0, 0, 0, 1);
+      orig.shape->set_fill_color(0, 0, 0, 1);
     }
   }
 }
@@ -90,13 +92,13 @@ Graph rectangular_grid(int w, int h, double size, double gap) {
                                      y * (size + gap) + size / 2,
                                      size,
                                      size),
-             x * w + y);
+             x * h + y);
       n.on_boundary = x==0 || y==0 || x==w-1 || y==h-1 ;
       out.add_node(n);
       if (x != 0) 
-        out.add_twosided_edge(x * w + y,(x-1) * w + y);
+        out.add_twosided_edge(x*h + y,(x-1)*h + y);
       if(y != 0)
-        out.add_twosided_edge(x * w + y,x*w + (y-1));
+        out.add_twosided_edge(x*h + y,x*h + (y-1));
     }
   }
   return out;

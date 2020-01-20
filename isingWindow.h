@@ -19,9 +19,9 @@ class IsingWindow : public sigc::trackable{
   Gtk::Window& getWindow();
 
  protected:
-  std::unique_ptr<IsingModel> model;
-  std::unique_ptr<Ticker> magnetismTicker;
-  std::unique_ptr<Ticker> varianceTicker;
+  std::shared_ptr<IsingModel> model;
+  std::shared_ptr<Ticker> magnetismTicker;
+  std::shared_ptr<Ticker> varianceTicker;
   Gtk::Window* window;
   sigc::connection timout;
   std::shared_ptr<Binding<double>> step_frequency;
