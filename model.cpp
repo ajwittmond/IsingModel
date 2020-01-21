@@ -2,8 +2,6 @@
 #include <cstdlib>
 
 
-
-
 double sigmoid(double x){
   return 1/(1 + exp(x));
 }
@@ -33,6 +31,8 @@ void IsingModel::step(){
       orig.shape->set_fill_color(0, 0, 0, 1);
     }
   }
+  if (pressed)
+    set_point();
 }
 
 void IsingModel::set_boundary(BoundaryType boundary){
@@ -54,6 +54,61 @@ void IsingModel::set_boundary(BoundaryType boundary){
   }
   boundary_type = boundary;
 
+}
+
+double IsingModel::get_scale(){
+  double height = 0;
+  for(Node& node: graph.nodes){
+    height = std::max(height,node.shape->bottom());
+  }
+  return (double)area->get_allocation().get_height()/height;
+}
+
+bool IsingModel::draw(const Cairo::RefPtr<Cairo::Context> &cr){
+  double scale = get_scale();
+  std::cout << "draw";
+  cr->scale(scale,scale);
+  return graph.draw(cr);
+}
+
+void IsingModel::set_mouse(double x, double y){
+  double scale = get_scale();
+  const Gtk::Allocation alloc = area->get_allocation();
+  mx = (x-alloc.get_x())/scale;
+  my = (y-alloc.get_y())/scale;
+}
+
+bool IsingModel::on_button(GdkEventButton *evt){
+  set_mouse(evt->x,evt->y);
+  if(pressed = (evt->state & Gdk::BUTTON1_MASK ||
+                evt->state & Gdk::BUTTON2_MASK ||
+                evt->state & Gdk::BUTTON3_MASK)){
+    set_point();
+  }
+  return false;
+}
+
+bool IsingModel::on_motion(GdkEventMotion * evt){
+  set_mouse(evt->x, evt->y);
+  if (pressed =
+          (evt->state & Gdk::BUTTON1_MASK || evt->state & Gdk::BUTTON2_MASK ||
+           evt->state & Gdk::BUTTON3_MASK)) {
+    set_point();
+  }
+  return false;
+}
+
+void IsingModel::set_point(){
+  bool changed = false;
+  for(Node& node : graph.nodes){
+    if(node.shape->point_inside(mx, my)){
+      node.spin = 1;
+      node.shape->set_fill_color(1, 1, 1, 1);
+      changed = true;
+    }
+  }
+  if(changed)
+    this->invalidate_rect();
 }
 
 BoundaryIterator& BoundaryIterator::operator++() {
@@ -95,7 +150,7 @@ Graph rectangular_grid(int w, int h, double size, double gap) {
              x * h + y);
       n.on_boundary = x==0 || y==0 || x==w-1 || y==h-1 ;
       out.add_node(n);
-      if (x != 0) 
+      if (x != 0)
         out.add_twosided_edge(x*h + y,(x-1)*h + y);
       if(y != 0)
         out.add_twosided_edge(x*h + y,x*h + (y-1));

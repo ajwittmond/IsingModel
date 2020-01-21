@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.22.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkAdjustment" id="adjustment1">
@@ -16,9 +16,6 @@
     <property name="name">window</property>
     <property name="can_focus">False</property>
     <signal name="delete-event" handler="windowDelete" swapped="no"/>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkPaned">
         <property name="visible">True</property>
@@ -290,6 +287,8 @@
                     <property name="max_length">10000</property>
                     <property name="width_chars">4</property>
                     <property name="adjustment">adjustment1</property>
+                    <property name="numeric">True</property>
+                    <property name="update_policy">if-valid</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -316,6 +315,9 @@
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
   <object class="GtkListStore" id="liststore1"/>

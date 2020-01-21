@@ -117,8 +117,15 @@ enum BoundaryType{
 
 
 class IsingModel : public Drawable, public AreaController{
- public:
-  Graph graph;
+private:
+  double get_scale();
+  bool pressed;
+  double mx,my;
+
+  void set_mouse(double x, double y);
+  void set_point();
+
+public : Graph graph;
   std::shared_ptr<Binding<double>> h;
   std::shared_ptr<Binding<double>> j;
   std::shared_ptr<Binding<double>> t;
@@ -130,16 +137,25 @@ class IsingModel : public Drawable, public AreaController{
              std::shared_ptr<Binding<double>> t)
       : graph(graph), h(h), j(j), t(t), AreaController(area) {
     connect(*area);
+    area->set_events(Gdk::ALL_EVENTS_MASK);
+    auto button = sigc::mem_fun(*this, &IsingModel::on_button);
+    area->signal_button_press_event().connect(button);
+    area->signal_button_release_event().connect(button);
+    area->signal_motion_notify_event().connect(
+        sigc::mem_fun(*this, &IsingModel::on_motion));
   }
+
+  bool on_button(GdkEventButton * evt);
+
+  bool on_motion(GdkEventMotion * evt);
 
   void step();
 
-  bool draw(const Cairo::RefPtr<Cairo::Context> &cr) override {
-    static int x = 0;
-    return graph.draw(cr);
-  }
+
+  bool draw(const Cairo::RefPtr<Cairo::Context> &cr) override;
 
   void set_boundary(BoundaryType boundary);
+
 };
 
 //generates a rectangular grid of the the given width and height

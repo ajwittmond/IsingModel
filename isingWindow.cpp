@@ -62,12 +62,17 @@ void IsingWindow::from_file() throw() {
   builder->get_widget("varianceArea",area);
   varianceTicker = std::make_shared<Ticker>(area);
   builder->get_widget("window", this->window);
-  timout = Glib::signal_timeout().connect(sigc::mem_fun(*this,&IsingWindow::step), 16);
+  window->set_events(Gdk::ALL_EVENTS_MASK);
+  timout =
+      Glib::signal_timeout().connect(sigc::mem_fun(*this, &IsingWindow::step),
+                                     16);
   this->step_frequency = fromEntry(10,fpsEntry);
   Gtk::SpinButton * width;
   Gtk::SpinButton * height;
   builder->get_widget("width", width);
   builder->get_widget("height", height);
+  width->get_adjustment()->set_upper(100000);
+  height->get_adjustment()->set_upper(100000);
   width->set_value(START_WIDTH);
   height->set_value(START_HEIGHT);
   auto changGridF = sigc::bind(&changeGrid,

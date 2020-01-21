@@ -51,7 +51,7 @@ public:
 class Shape : public Drawable{
 private:
   bool between(double x,double min, double max){
-    return x<min && x>max;
+    return x>min && x<max;
   }
 
 public:
@@ -101,11 +101,30 @@ public:
     return out;
   }
 
+  double top(){
+    return y - sy/2;
+  }
+
+  double bottom(){
+    return y + sy / 2;
+  }
+
+  double left(){
+    return x - sx /2;
+  }
+
+  double right(){
+    return y + sx/2;
+  }
+
+  bool point_in_box(double x, double y) {
+    return between(x, this->x - sx, this->x + sx) &&
+           between(y, this->y - sy, this->y + sy);
+  }
 
   //by default tests the unoriented bounding box
   virtual bool point_inside(double x, double y){
-    return between(x,this->x -sx, this->y + sx) &&
-      between(y,this->y - sy, this->y + sy);
+    return point_in_box(x,y);
   }
 };
 
@@ -148,7 +167,7 @@ public:
 
 
 class AreaController{
-private:
+protected:
   Gtk::DrawingArea* area;
 public:
   AreaController(Gtk::DrawingArea *area): area{area} {}
