@@ -80,7 +80,6 @@ void IsingModel::set_mouse(double x, double y){
 void IsingModel::process_state(guint state){
   left_pressed = ( state & Gdk::BUTTON1_MASK ) != 0;
   right_pressed = ( state & Gdk::BUTTON3_MASK ) != 0;
-  std::cout << left_pressed << " " << right_pressed << std::endl;
 }
 
 bool IsingModel::on_button(GdkEventButton *evt){
