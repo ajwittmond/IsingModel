@@ -35,6 +35,7 @@ void changeGrid(std::shared_ptr<IsingModel> model,
                                   floor(h.get_value()),
                                   10,
                                   2);
+  model->invalidate_rect();
 }
 
 void IsingWindow::from_file() throw() {
@@ -81,6 +82,8 @@ void IsingWindow::from_file() throw() {
                                height->property_value());
   width->signal_changed().connect(changGridF);
   height->signal_changed().connect(changGridF);
+  width->signal_value_changed().connect(changGridF);
+  height->signal_value_changed().connect(changGridF);
   builder->get_widget("playButton", running);
   Gtk::ComboBoxText* boundary;
   builder->get_widget("boundaryBox", boundary);

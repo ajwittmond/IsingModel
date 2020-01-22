@@ -31,7 +31,7 @@ void IsingModel::step(){
       orig.shape->set_fill_color(0, 0, 0, 1);
     }
   }
-  if (pressed)
+  if (left_pressed || right_pressed)
     set_point();
 }
 
@@ -66,7 +66,6 @@ double IsingModel::get_scale(){
 
 bool IsingModel::draw(const Cairo::RefPtr<Cairo::Context> &cr){
   double scale = get_scale();
-  std::cout << "draw";
   cr->scale(scale,scale);
   return graph.draw(cr);
 }
@@ -78,11 +77,16 @@ void IsingModel::set_mouse(double x, double y){
   my = (y-alloc.get_y())/scale;
 }
 
+void IsingModel::process_state(guint state){
+  left_pressed = ( state & Gdk::BUTTON1_MASK ) != 0;
+  right_pressed = ( state & Gdk::BUTTON3_MASK ) != 0;
+  std::cout << left_pressed << " " << right_pressed << std::endl;
+}
+
 bool IsingModel::on_button(GdkEventButton *evt){
   set_mouse(evt->x,evt->y);
-  if(pressed = (evt->state & Gdk::BUTTON1_MASK ||
-                evt->state & Gdk::BUTTON2_MASK ||
-                evt->state & Gdk::BUTTON3_MASK)){
+  //process_state(evt->state);
+  if (left_pressed || right_pressed) {
     set_point();
   }
   return false;
@@ -90,9 +94,8 @@ bool IsingModel::on_button(GdkEventButton *evt){
 
 bool IsingModel::on_motion(GdkEventMotion * evt){
   set_mouse(evt->x, evt->y);
-  if (pressed =
-          (evt->state & Gdk::BUTTON1_MASK || evt->state & Gdk::BUTTON2_MASK ||
-           evt->state & Gdk::BUTTON3_MASK)) {
+  process_state(evt->state);
+  if (left_pressed || right_pressed) {
     set_point();
   }
   return false;
@@ -102,8 +105,13 @@ void IsingModel::set_point(){
   bool changed = false;
   for(Node& node : graph.nodes){
     if(node.shape->point_inside(mx, my)){
-      node.spin = 1;
-      node.shape->set_fill_color(1, 1, 1, 1);
+      if (left_pressed) {
+        node.spin = 1;
+        node.shape->set_fill_color(1, 1, 1, 1);
+      } else if (right_pressed) {
+        node.spin = -1;
+        node.shape->set_fill_color(0, 0, 0, 1);
+      }
       changed = true;
     }
   }

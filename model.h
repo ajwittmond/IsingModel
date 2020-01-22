@@ -119,12 +119,14 @@ enum BoundaryType{
 class IsingModel : public Drawable, public AreaController{
 private:
   double get_scale();
-  bool pressed;
+  bool left_pressed;
+  bool right_pressed;
   double mx,my;
 
   void set_mouse(double x, double y);
   void set_point();
 
+  void process_state(guint state);
 public : Graph graph;
   std::shared_ptr<Binding<double>> h;
   std::shared_ptr<Binding<double>> j;

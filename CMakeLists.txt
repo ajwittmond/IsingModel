@@ -28,4 +28,4 @@ add_executable(Ising main.cpp isingWindow.cpp ticker.cpp model.cpp)
 
 # Link the target to the GTK+ libraries
 TARGET_LINK_LIBRARIES(Ising ${GTK3_LIBRARIES})
-target_compile_options(Ising PRIVATE -rdynamic  -export-dynamic)
+target_compile_options(Ising PRIVATE  -rdynamic  -export-dynamic)
