@@ -103,7 +103,7 @@ bool IsingModel::on_motion(GdkEventMotion * evt){
 void IsingModel::set_point(){
   bool changed = false;
   for(Node& node : graph.nodes){
-    if(node.shape->point_inside(mx, my)){
+    if(node.shape->point_inside(mx, my) && !(node.on_boundary && boundary_type!=VARIABLE)){
       if (left_pressed) {
         node.spin = 1;
         node.shape->set_fill_color(1, 1, 1, 1);
@@ -165,5 +165,4 @@ Graph rectangular_grid(int w, int h, double size, double gap) {
   }
   return out;
 }
-
 

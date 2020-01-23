@@ -59,9 +59,9 @@ void IsingWindow::from_file() throw() {
                                    fromEntry(1, tEntry)
                                    );
   builder->get_widget("magnetismArea", area);
-  magnetismTicker = std::make_shared<Ticker>(area);
+  magnetismTicker = std::make_shared<Ticker>(area,1,-1,30);
   builder->get_widget("varianceArea",area);
-  varianceTicker = std::make_shared<Ticker>(area);
+  varianceTicker = std::make_shared<Ticker>(area,1,-1,30);
   builder->get_widget("window", this->window);
   window->set_events(Gdk::ALL_EVENTS_MASK);
   timout =
@@ -108,7 +108,7 @@ bool IsingWindow::step() {
   static double timer  = 0;
   const int INTERVAL = 1;
   double dt = 0;
-
+  static double time =0; 
   //time keeping and reporting
   if (first){
     first = false;
@@ -142,13 +142,27 @@ bool IsingWindow::step() {
     //update logic
     static double step_timer = 0;
     step_timer+=dt;
+    time+=dt;
 
     if (step_timer > 1.0 / *step_frequency) {
       step_timer -= 1.0 / *step_frequency;
       model->step();
       model->invalidate_rect();
-      magnetismTicker->invalidate_rect();
-      varianceTicker->invalidate_rect();
+      double meanMagnetism = 0;
+      for(Node& n : model->graph.nodes){
+        meanMagnetism += n.spin;
+      }
+      meanMagnetism/=model->graph.nodes.size();
+      magnetismTicker->tick(time,meanMagnetism);
+      double variance = 0;
+      for (Node &n : model->graph.nodes) {
+        variance += (n.spin - meanMagnetism) * (n.spin - meanMagnetism);
+      }
+
+      variance/= model->graph.nodes.size()-1;
+      std::cout << variance << std::endl;
+      varianceTicker->tick(time,variance);
+
     }
   }
   return true;
