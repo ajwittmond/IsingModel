@@ -30,11 +30,16 @@ void reset(std::shared_ptr<IsingModel> model){
 
 void changeGrid(std::shared_ptr<IsingModel> model,
                 Glib::PropertyProxy<double> w,
-                Glib::PropertyProxy<double> h){
-  model->graph = rectangular_grid(floor(w.get_value()),
-                                  floor(h.get_value()),
-                                  10,
-                                  2);
+                Glib::PropertyProxy<double> h,
+                Glib::PropertyProxy<int> gridType){
+  if(gridType.get_value() == 1)
+    model->graph = rectangular_grid(floor(w.get_value()),
+                                    floor(h.get_value()),
+                                    10,
+                                    2);
+  else
+    model->graph =
+        hexagonal_grid(floor(w.get_value()), floor(h.get_value()), 10, 2);
   model->invalidate_rect();
 }
 
@@ -53,7 +58,7 @@ void IsingWindow::from_file() throw() {
   builder->get_widget("fpsEntry", fpsEntry);
   const int START_WIDTH=40, START_HEIGHT=40;
   model =
-      std::make_shared<IsingModel>(area, rectangular_grid(START_WIDTH, START_HEIGHT, 10, 2),
+      std::make_shared<IsingModel>(area, hexagonal_grid(START_WIDTH, START_HEIGHT, 10, 2),
                                    fromEntry(1, hEntry),
                                    fromEntry(1, jEntry),
                                    fromEntry(1, tEntry)
@@ -68,6 +73,8 @@ void IsingWindow::from_file() throw() {
       Glib::signal_timeout().connect(sigc::mem_fun(*this, &IsingWindow::step),
                                      16);
   this->step_frequency = fromEntry(10,fpsEntry);
+  Gtk::ComboBoxText *graphType;
+  builder->get_widget("graphType", graphType);
   Gtk::SpinButton * width;
   Gtk::SpinButton * height;
   builder->get_widget("width", width);
@@ -79,11 +86,13 @@ void IsingWindow::from_file() throw() {
   auto changGridF = sigc::bind(&changeGrid,
                                model,
                                width->property_value(),
-                               height->property_value());
+                               height->property_value(),
+                               graphType->property_active());
   width->signal_changed().connect(changGridF);
   height->signal_changed().connect(changGridF);
   width->signal_value_changed().connect(changGridF);
   height->signal_value_changed().connect(changGridF);
+  graphType->signal_changed().connect(changGridF);
   builder->get_widget("playButton", running);
   Gtk::ComboBoxText* boundary;
   builder->get_widget("boundaryBox", boundary);
@@ -160,7 +169,6 @@ bool IsingWindow::step() {
       }
 
       variance/= model->graph.nodes.size()-1;
-      std::cout << variance << std::endl;
       varianceTicker->tick(time,variance);
 
     }

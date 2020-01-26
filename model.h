@@ -162,3 +162,5 @@ public : Graph graph;
 
 //generates a rectangular grid of the the given width and height
 Graph rectangular_grid(int w, int h, double size,double gap);
+
+Graph hexagonal_grid(int w, int h, double size, double gap);

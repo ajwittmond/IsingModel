@@ -37,7 +37,6 @@ void IsingModel::step(){
 
 void IsingModel::set_boundary(BoundaryType boundary){
   bool even = true;
-  std::cout << boundary << std::endl;
   for(Node& node : graph.get_boundary()){
     even = !even;
     switch(boundary){
@@ -161,6 +160,41 @@ Graph rectangular_grid(int w, int h, double size, double gap) {
         out.add_twosided_edge(x*h + y,(x-1)*h + y);
       if(y != 0)
         out.add_twosided_edge(x*h + y,x*h + (y-1));
+    }
+  }
+  return out;
+}
+
+Graph hexagonal_grid(int w, int h, double size, double gap){
+  Graph out;
+  out.nodes = std::vector<Node>();
+  out.edges = std::vector<std::vector<int>>(w * h);
+  for (int i = 0; i < w * h; i++)
+    out.edges.push_back(std::vector<int>(3));
+  for (int x = 0; x < w; x++) {
+    bool even = false;
+    for (int y = 0; y < h; y++) {
+      even = !even;
+      double offset = even ?  (size + 2*gap) / 2 : 0 ;
+      Node n(std::make_shared<Hexagon>(
+                 offset + x * (size + gap) + size / 2,
+                 y * (size * (1 - 1 / (2 * sqrt(3))) + gap) + size / 2, size, size),
+             x * h + y);
+      n.on_boundary = x == 0 || y == 0 || x == w - 1 || y == h - 1;
+      out.add_node(n);
+      if (x != 0){
+        out.add_twosided_edge(x * h + y, (x - 1) * h + y);
+        if(even){
+          if(y != 0){
+            out.add_twosided_edge(x * h + y, (x - 1) * h + (y-1));
+          }
+          if(y != h-1){
+            out.add_twosided_edge(x * h + y, (x - 1) * h + (y+1));
+          }
+        }
+      }
+      if (y != 0)
+        out.add_twosided_edge(x * h + y, x * h + (y - 1));
     }
   }
   return out;

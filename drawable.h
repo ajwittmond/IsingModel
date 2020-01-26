@@ -145,18 +145,20 @@ public:
   }
 };
 
-class Triangle : public Shape {
+class Hexagon : public Shape {
 public:
-  Triangle() = default;
+  Hexagon() = default;
 
-  Triangle(double x, double y, double sx, double sy) : Shape(x, y, sx, sy) {}
+  Hexagon(double x, double y, double sx, double sy) : Shape(x, y, sx, sy) {}
 
   virtual bool draw_shape(const Cairo::RefPtr<Cairo::Context> &cr) override {
-    cr->move_to(0, -0.5);
-    cr->move_to(-0.5, 0);
-    cr->move_to(0, 1);
-    cr->move_to(1, 0);
-    cr->move_to(0, 1);
+    cr->translate(-0.5, -0.5);
+    cr->move_to(0.5 , 0);
+    cr->line_to(1,1/(2*sqrt(3)));
+    cr->line_to(1,1 - 1 / (2 * sqrt(3)));
+    cr->line_to(0.5, 1);
+    cr->line_to(0,1 - 1 / (2 * sqrt(3)));
+    cr->line_to(0, 1 / (2 * sqrt(3)));
     cr->close_path();
     cr->fill();
     cr->set_source_rgb(sr, sg, sb);
