@@ -10,5 +10,5 @@ make
 
 Depends on Gtk+3.0 and gtkmm
 
-![image of gui](https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true)
+![image of gui](https://github.com/ajwittmond/IsingModel/blob/master/Peek 2020-08-13 12-00.gif?raw=true)
 
