@@ -5,7 +5,7 @@ generalization of it.
 https://en.wikipedia.org/wiki/Ising_model
 
 To build just do 
-cmake . \\
+cmake . <br>
 make 
 
 Depends on Gtk+3.0 and gtkmm
