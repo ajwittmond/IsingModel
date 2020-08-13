@@ -4,7 +4,7 @@ generalization of it.
 
 https://en.wikipedia.org/wiki/Ising_model
 
-To build just do 
+To build just do <br>
 cmake . <br>
 make 
 
