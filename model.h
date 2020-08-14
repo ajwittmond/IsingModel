@@ -51,14 +51,17 @@ public:
   Graph& add_twosided_edge(int a, int b){
     add_edge(a,b);
     add_edge(b,a);
+    return *this;
   }
 
   Graph& add_edge(int a , int b){
     edges[a].push_back(b);
+    return *this;
   }
 
   Graph& add_node(Node n){
     nodes.push_back(n);
+    return *this;
   }
 
 };
