@@ -1,6 +1,7 @@
 #include "ticker.h"
 #include <iostream>
 
+
 bool Ticker::draw(const Cairo::RefPtr<Cairo::Context> &cr){
   double max_time = 0;
   double max_value = 0;
@@ -8,8 +9,10 @@ bool Ticker::draw(const Cairo::RefPtr<Cairo::Context> &cr){
     max_time = std::max(max_time, s.time);
     max_value = std::max(max_value, s.value);
   }
+
   double scale = area->get_allocation().get_height();
   double width = area->get_allocation().get_width()/scale;
+
   cr->scale(scale, scale);
 
 

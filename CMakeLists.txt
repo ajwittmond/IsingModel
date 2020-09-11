@@ -12,6 +12,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 FIND_PACKAGE(PkgConfig REQUIRED)
 PKG_CHECK_MODULES(GTK3 REQUIRED gtkmm-3.0)
 
+SET(CMAKE_CXX_FLAGS "-O3")
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Setup CMake to use GTK+, tell the compiler where to look for headers

@@ -4,6 +4,8 @@
 #include <sigc++/sigc++.h>
 #include <vector>
 
+//class to represent a hierarchy of objects drawable to a cairo canvas
+//child drawables can be added and are automatically drawn
 class Drawable : public sigc::trackable{
 protected:
   std::vector<std::shared_ptr<Drawable>> children;
@@ -21,6 +23,7 @@ public:
 
   virtual bool draw(const Cairo::RefPtr<Cairo::Context>& cr) = 0;
 
+  //add drawable to area
   void connect(Gtk::DrawingArea& area){
     area.signal_draw().connect(sigc::mem_fun(*this, &Drawable::draw));
   }
@@ -47,7 +50,8 @@ public:
   }
 };
 
-
+// An abstract drawable that draws some primitive cairo path with a given fill, stroke
+// scale, orientation, and position
 class Shape : public Drawable{
 private:
   bool between(double x,double min, double max){
@@ -128,6 +132,8 @@ public:
   }
 };
 
+
+
 class Square : public Shape{
 public:
   Square() = default;
@@ -140,7 +146,7 @@ public:
     cr->close_path();
     cr->fill();
     cr->set_source_rgb(sr, sg, sb);
-    cr->stroke();
+    //cr->stroke();
     return false;
   }
 };
@@ -167,7 +173,8 @@ public:
   }
 };
 
-
+// a wrapper for a drawing area that add a convienience function
+// for triggering a draw
 class AreaController{
 protected:
   Gtk::DrawingArea* area;

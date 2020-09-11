@@ -43,6 +43,7 @@ void changeGrid(std::shared_ptr<IsingModel> model,
   model->invalidate_rect();
 }
 
+//here are all the data bindings
 void IsingWindow::from_file() throw() {
   builder = Gtk::Builder::create();
   builder->add_from_file("Ising.glade");
@@ -69,9 +70,10 @@ void IsingWindow::from_file() throw() {
   varianceTicker = std::make_shared<Ticker>(area,1,-1,30);
   builder->get_widget("window", this->window);
   window->set_events(Gdk::ALL_EVENTS_MASK);
+  //the timing for the main loop is set here
   timout =
       Glib::signal_timeout().connect(sigc::mem_fun(*this, &IsingWindow::step),
-                                     16);
+                                     16 /** 60 fps */);
   this->step_frequency = fromEntry(10,fpsEntry);
   Gtk::ComboBoxText *graphType;
   builder->get_widget("graphType", graphType);
@@ -108,6 +110,7 @@ Gtk::Window& IsingWindow::getWindow(){
   return *window;
 }
 
+//main update loop
 bool IsingWindow::step() {
   //time keeping logic
   static std::vector<double> samples(128);

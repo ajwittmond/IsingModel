@@ -26,6 +26,7 @@ class IsingWindow : public sigc::trackable{
   sigc::connection timout;
   std::shared_ptr<Binding<double>> step_frequency;
 
+  //main update loop
   bool step();
 
 private:

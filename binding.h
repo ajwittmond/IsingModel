@@ -2,7 +2,9 @@
 #include <gtkmm.h>
 
 
-//wrapper for property proxys
+//wrapper for property proxies that acts more
+//like how I want a data binding to act
+//overrides assignment
 template <class T> class Binding {
 public:
   T value;
@@ -49,6 +51,8 @@ void set_value(Glib::PropertyProxy<K> proxy, const K value){
   proxy.set_value(value);
 }
 
+//generates a binding from an initial value and a slot for receiving
+//values and a slot for updating values.
 template <class T, class K>
 std::shared_ptr<Binding<T>> to_from_binding(T first,
                                             Glib::PropertyProxy<K> prop,
@@ -64,6 +68,8 @@ std::shared_ptr<Binding<T>> to_from_binding(T first,
   return out;
 }
 
+//changes a binding to one using that passed slots to transmit and
+//receive values
 template <class T, class K>
   void set_to_from_binding(
                            Binding<T>& b,

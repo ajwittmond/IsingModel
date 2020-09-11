@@ -5,6 +5,7 @@
 #include <iostream>
 #include "binding.h"
 
+//A single cell in the model with the properties needed to draw it
 class Node : public ChildDrawer{
 private:
   int index;
@@ -31,6 +32,8 @@ public:
 
 class Boundary;
 
+//data structure to hold the cells used in the Ising simulation
+//in a way  that allows for multiple topologies
 class Graph : public Drawable{
 public:
   Graph() = default;
@@ -66,6 +69,7 @@ public:
 
 };
 
+//iterator that runs over the boundary cells
 class BoundaryIterator : public std::iterator<std::forward_iterator_tag, Node>{
 private:
   int curr = -1;
@@ -99,6 +103,7 @@ public:
 
 };
 
+//class to generate iterator for easy access to the boundary
 class Boundary{
 private:
   Graph &graph;
@@ -111,6 +116,7 @@ public:
   BoundaryIterator end() { return BoundaryIterator(graph); }
 };
 
+//Type of boundary for simulation i.e. what the cells on the edge do
 enum BoundaryType{
               POSITIVE=0,
               NEGATIVE=1,
@@ -166,4 +172,6 @@ public : Graph graph;
 //generates a rectangular grid of the the given width and height
 Graph rectangular_grid(int w, int h, double size,double gap);
 
+
+//generates a hexagonal grid of the the given width and height
 Graph hexagonal_grid(int w, int h, double size, double gap);
